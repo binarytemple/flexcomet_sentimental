@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="initVars()">
+<mx:Panel title="Comet Chat Client" paddingTop="10" paddingBottom="10"
+    paddingLeft="10" paddingRight="10" width="100%" height="100%">
+<mx:Label id="lab" text="Comet Chat Client" fontWeight="bold" fontSize="24"/>
+<mx:VBox x="10" y="64" height="100%" width="100%">
+<mx:HBox x="10" y="20" width="100%">
+  <mx:Label text="Username" fontSize="16"/>
+  <mx:TextInput id="UsernameInput" enter="onLoginOut()"/>
+  <mx:Button id="LoginButton" label="Login" click="onLoginOut()"/>
+</mx:HBox>
+<mx:Label text="Chat Messages" fontSize="16"/>
+<mx:TextArea id="ChatMessagesText" editable="false" width="100%" height="300"/>
+<mx:HBox>
+  <mx:TextInput id="ChatMessagesEntry" enter="onSend()" editable="false" width="100%" height="30"/>
+  <mx:Button id="SendButton" label="Send" click="onSend()" enabled="false"/>
+</mx:HBox>
+</mx:VBox>
+</mx:Panel>
+<mx:Script>
+    <![CDATA[
+    import org.cometd.*;
+    import mx.controls.*;
+    import mx.events.*;
+    import mx.rpc.events.*;
+	import mx.utils.URLUtil;
+    
+    public var h:CometClient;
+    public var currentUser:String;
+    
+	private function initVars():void {
+		h = new CometClient();
+        // TODO: use flashvars to configure cometURL
+		h.cometURL = "http://" + URLUtil.getServerNameWithPort(Application.application.url) + "/cometd/";		
+	}
+    
+    private function onLoginOut():void {
+    	if (currentUser == null) {
+    		// Must be logging in
+    		currentUser = UsernameInput.text;
+    		
+    		LoginButton.label = "Logout";
+    		UsernameInput.editable = false;
+            ChatMessagesText.text = currentUser + " logged in..\n";
+            SendButton.enabled = true;
+            ChatMessagesEntry.editable = true;
+            
+    		h.init();
+            h.subscribe("/chat/demo", onResponse, null);
+            h.publish( "/chat/demo", { user: currentUser, chat: currentUser + " joined the chat.." } );
+    	}
+    	else {
+    		// Must be logging out
+    		currentUser = null;
+    		
+    		LoginButton.label = "Login";
+    		UsernameInput.editable = true;
+    		UsernameInput.text = "";
+    		SendButton.enabled = false;
+    		ChatMessagesEntry.editable = false;
+    		
+    		// h.unsubscribe()..
+    		h.disconnect();
+    	}
+    }
+
+    private function onResponse(obj:Object):void {
+        ChatMessagesText.text += obj.data.user + ": " + obj.data.chat + "\n";
+    }
+
+    private function onSend():void {
+        ChatMessagesText.text += currentUser + ": " + ChatMessagesEntry.text + "\n";
+    	h.publish( "/chat/demo", { user: currentUser, chat: ChatMessagesEntry.text } );
+        ChatMessagesEntry.text = "";
+    }
+    ]]>
+</mx:Script>
+</mx:Application>
