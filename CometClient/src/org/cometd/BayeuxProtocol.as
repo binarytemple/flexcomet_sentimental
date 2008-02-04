@@ -22,7 +22,6 @@ public class BayeuxProtocol
     public static const META_DISCONNECT:String    ="/meta/disconnect";
     public static const META_HANDSHAKE:String     ="/meta/handshake";
     public static const META_PING:String          ="/meta/ping";
-    public static const META_RECONNECT:String     ="/meta/reconnect";
     public static const META_STATUS:String        ="/meta/status";
     public static const META_SUBSCRIBE:String     ="/meta/subscribe";
     public static const META_UNSUBSCRIBE:String   ="/meta/unsubscribe";
@@ -44,8 +43,12 @@ public class BayeuxProtocol
     public static const TRANSPORT_CALLBACKPOLLING:String ="callback-polling";
     
     // Advice values
-    public static const ADVICE_RECONNECT_RETRY:String    ="retry";
-    public static const ADVICE_RECONNECT_NONE:String     ="none";    
+    public static const ADVICE_RECONNECT_RETRY:String	  ="retry";
+    public static const ADVICE_RECONNECT_HANDSHAKE:String ="handshake"; 
+    public static const ADVICE_RECONNECT_NONE:String      ="none";    
+    
+    public static const ADVICE_INTERVAL:String            ="interval";
+    public static const ADVICE_MULTIPLECLIENTS:String     ="multiple-clients";
 }
 
 }

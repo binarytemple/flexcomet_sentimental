@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actionScriptProperties version="1" mainApplicationPath="CometClient.as">
-    <compiler additionalCompilerArguments="" copyDependentFiles="false" generateAccessible="false" strict="true" warn="true" htmlGenerate="false" htmlPlayerVersionCheck="true" htmlPlayerVersion="9.0.0" htmlExpressInstall="true" htmlHistoryManagement="false" outputFolderPath="bin" sourceFolderPath="src">
+  <compiler additionalCompilerArguments="" copyDependentFiles="false" generateAccessible="false" strict="true" warn="true" htmlGenerate="false" htmlPlayerVersionCheck="true" htmlPlayerVersion="9.0.0" htmlExpressInstall="true" htmlHistoryManagement="false" outputFolderPath="bin" sourceFolderPath="src">
     <compilerSourcePath/>
     <libraryPath>
       <libraryPathEntry kind="3" path="${FRAMEWORKS}/libs/playerglobal.swc" linkType="2"/>

@@ -10,11 +10,13 @@
   <mx:Button id="LoginButton" label="Login" click="onLoginOut()"/>
 </mx:HBox>
 <mx:Label text="Chat Messages" fontSize="16"/>
-<mx:TextArea id="ChatMessagesText" editable="false" width="100%" height="300"/>
+<mx:TextArea id="ChatMessagesText" editable="false" width="100%" height="150"/>
 <mx:HBox>
   <mx:TextInput id="ChatMessagesEntry" enter="onSend()" editable="false" width="100%" height="30"/>
   <mx:Button id="SendButton" label="Send" click="onSend()" enabled="false"/>
 </mx:HBox>
+<mx:Label text="Debug Messages" fontSize="16"/>
+<mx:TextArea id="DebugMessages" editable="false" width="100%" height="80"/>
 </mx:VBox>
 </mx:Panel>
 <mx:Script>
@@ -29,9 +31,25 @@
     public var currentUser:String;
     
 	private function initVars():void {
+		// Retrieve config params from flashvars
+		var cometServer:String = Application.application.parameters[CometClient.COMET_SERVER_FLASHVAR];
+		var cometURL:String = Application.application.parameters[CometClient.COMET_URL_FLASHVAR];
+		
+		if ( cometServer == null ) {
+			cometServer = URLUtil.getServerNameWithPort(Application.application.url);
+		}
+		
+		if ( cometURL == null ) {
+			cometURL = "/cometd"
+		}
+		
 		h = new CometClient();
-        // TODO: use flashvars to configure cometURL
-		h.cometURL = "http://" + URLUtil.getServerNameWithPort(Application.application.url) + "/cometd/";		
+		h.cometURL = "http://" + cometServer + cometURL;
+		h.debugHandler = debugMessageHandler;
+	}
+	
+	private function debugMessageHandler(msg:String):void {
+		DebugMessages.text += msg + "\n";
 	}
     
     private function onLoginOut():void {
@@ -46,7 +64,7 @@
             ChatMessagesEntry.editable = true;
             
     		h.init();
-            h.subscribe("/chat/demo", onResponse, null);
+            h.subscribe("/chat/*", onChatResponse, null);
             h.publish( "/chat/demo", { user: currentUser, chat: currentUser + " joined the chat.." } );
     	}
     	else {
@@ -64,12 +82,11 @@
     	}
     }
 
-    private function onResponse(obj:Object):void {
+    private function onChatResponse(obj:Object):void {
         ChatMessagesText.text += obj.data.user + ": " + obj.data.chat + "\n";
     }
 
     private function onSend():void {
-        ChatMessagesText.text += currentUser + ": " + ChatMessagesEntry.text + "\n";
     	h.publish( "/chat/demo", { user: currentUser, chat: ChatMessagesEntry.text } );
         ChatMessagesEntry.text = "";
     }
