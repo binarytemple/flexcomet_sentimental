@@ -9,13 +9,15 @@
   <mx:TextInput id="CometURLInput"/>
   <mx:Button id="InitButton" label="Initialize client" click="onInitClient()"/>
 </mx:HBox>
+<mx:VBox id="MainUI" enabled="false">
 <mx:HBox x="10" y="20" width="100%">
   <mx:Label text="Subscribe Channel" fontSize="16"/>
   <mx:TextInput id="ChannelInput" enter="onSubscribe()"/>
   <mx:Button id="SubscribeButton" label="Subscribe" click="onSubscribe()"/>
+  <mx:Button id="UnsubscribeButton" label="Unsubscribe" click="onUnsubscribe()"/>
 </mx:HBox>
 <mx:Label text="Received Messages" fontSize="16"/>
-<mx:TextArea id="ReceivedMessagesText" editable="false" width="100%" height="150"/>
+<mx:TextArea id="ReceivedMessagesText" editable="false" width="100%" height="150" valueCommit="ReceivedMessagesText.verticalScrollPosition=ReceivedMessagesText.maxVerticalScrollPosition"/>
 <mx:HBox>
   <mx:Label text="Publish Channel" fontSize="16"/>
   <mx:TextInput id="PublishChannelInput"/>
@@ -24,7 +26,8 @@
   <mx:Button id="PublishButton" label="Publish" click="onPublish()" enabled="true"/>
 </mx:HBox>
 <mx:Label text="Debug Messages" fontSize="16"/>
-<mx:TextArea id="DebugMessages" editable="false" width="100%" height="80"/>
+<mx:TextArea id="DebugMessages" editable="false" width="100%" height="80" valueCommit="DebugMessages.verticalScrollPosition=DebugMessages.maxVerticalScrollPosition"/>	
+</mx:VBox>
 </mx:VBox>
 </mx:Panel>
 <mx:Script>
@@ -37,8 +40,6 @@
     import com.adobe.serialization.json.JSON;
     
     public var h:CometClient;
-    public var currentUser:String;
-    
     public var cometURL:String;
     
 	private function initVars():void {
@@ -63,6 +64,7 @@
 		h.cometURL = CometURLInput.text;
 		h.debugHandler = debugMessageHandler;
         h.init();
+        MainUI.enabled = true;
 	}
 	
 	private function debugMessageHandler(msg:String):void {
@@ -71,6 +73,10 @@
     
     private function onSubscribe():void {
         h.subscribe( ChannelInput.text, onSubscribeResponse, null);
+    }
+
+    private function onUnsubscribe():void {
+        h.unsubscribe( ChannelInput.text );
     }
 
     private function onSubscribeResponse(obj:Object):void {
