@@ -403,7 +403,7 @@ public class CometClient
            var interval:int = _advice.interval as int;
         if ( interval > 0 ) {
             debugOutput( "connectHandler(): waiting reconnect interval=" + interval ); 
-            setTimeout(sendMessage, interval, [ _httpTunnel, reconnect ]);
+            setTimeout(sendMessage, interval, _httpTunnel, reconnect );
         }
         else {
             sendMessage( _httpTunnel, reconnect );
