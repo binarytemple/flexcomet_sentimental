@@ -455,6 +455,7 @@ public class CometClient
         // TODO: explicitly handle commented json..
         var result:String = String(evt.result);
         result = result.slice(result.indexOf("["), result.lastIndexOf("]")+1);
+        if(result == "") return new Array();
         var decodedJSON:Object = JSON.decode(result);
         return ArrayUtil.toArray(decodedJSON);
     }
