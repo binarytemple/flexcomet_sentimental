@@ -68,7 +68,6 @@
 		h = new CometClient();
 		h.cometURL = CometURLInput.text;
 		h.debugHandler = debugMessageHandler;
-		h.subscribe(
         h.init();
         MainUI.enabled = true;
 	}
