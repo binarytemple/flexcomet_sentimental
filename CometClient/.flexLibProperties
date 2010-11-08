@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <flexLibProperties version="1">
-  <includeClasses>
-    <classEntry path="org.cometd.BayeuxProtocol"/>
-    <classEntry path="org.cometd.CometClient"/>
-    <classEntry path="org.cometd.events.PublishEvent"/>
-    <classEntry path="org.cometd.mxml.Comet"/>
-    <classEntry path="org.cometd.mxml.Subscription"/>
-  </includeClasses>
-  <includeResources/>
-  <namespaceManifests/>
+<includeClasses>
+<classEntry path="org.cometd.BayeuxProtocol"/>
+<classEntry path="org.cometd.CometClient"/>
+<classEntry path="org.cometd.events.PublishEvent"/>
+<classEntry path="org.cometd.mxml.Comet"/>
+<classEntry path="org.cometd.mxml.Subscription"/>
+</includeClasses>
+<includeResources/>
+<namespaceManifests/>
 </flexLibProperties>

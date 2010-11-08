@@ -147,6 +147,7 @@ public class CometClient
     
     private function sendHandshake():AsyncToken {
         _currentHandshakeAttempt++;
+        debugOutput("sendHandshake() _currentHandshakeAttempt=" + _currentHandshakeAttempt);
         
         // Handshake w/ server
         var handshake:Object = {
@@ -191,6 +192,8 @@ public class CometClient
         // At this point, ch holds either the full channel or the root of a wildcard channel
         _subscriptionListeners.push( { channel: ch, star: s, starstar: ss, that: that, cb: cb } );
         
+        debugOutput( "subscribe(): ch=" + ch );
+
         var subscribe:Object = {
             channel: BayeuxProtocol.META_SUBSCRIBE,
             clientId: _clientId,
@@ -272,7 +275,12 @@ public class CometClient
     public function disconnect():void
     {
         debugOutput("disconnect() called.");
-        
+     
+        var disconnect : Object = {channel: "/meta/disconnect",clientId: 
+        _clientId};
+        sendMessage( _httpCommand, disconnect );
+        sendMessage( _httpTunnel, disconnect );
+
         _httpTunnel.disconnect();
         _httpTunnel = null;
         _httpCommand.disconnect();
@@ -299,11 +307,17 @@ public class CometClient
     
     private function handshakeHandler(evt:ResultEvent):void
     {
-        debugOutput("handshakeHandler(): received response.");
         var messages:Array = parseResult(evt);
         
         // FIXME: Assuming handshake always returns just one message (is this per spec?)
         _handshakeReturn = messages[0];
+
+        if ( _handshakeReturn.channel != "/meta/handshake" ) {
+            return;
+        }
+
+        debugOutput("handshakeHandler(): received response");
+
         _advice = _handshakeReturn.advice;
         
         // Was handshake successful?
@@ -415,6 +429,7 @@ public class CometClient
         debugOutput( "commandHandler(): " + messages );
         
         for each( var msg:Object in messages ) {
+            debugOutput( "commandHandler() object channel(successful)=: " + msg.channel + "(" + msg.successful + ")" );
             // Update advice if present
             if (msg.advice != null) {
                 _advice = msg.advice;
@@ -426,7 +441,8 @@ public class CometClient
                 }
             }
             // Messages on non-meta channels are event broadcasts, so notify subscribers
-            if (msg.channel != null && (msg.channel as String).indexOf("/meta/") != 0) {
+            if ( msg.successful === undefined && msg.data != null &&
+                 msg.channel != null && (msg.channel as String).indexOf("/meta/") != 0 ) {
                 for (var i:int=0; i < _subscriptionListeners.length; ++i) {
                     var subscription:Object = _subscriptionListeners[i];
                     if ( channelMatchesSubscription( msg.channel, subscription ) ) {
@@ -455,6 +471,7 @@ public class CometClient
         // TODO: explicitly handle commented json..
         var result:String = String(evt.result);
         result = result.slice(result.indexOf("["), result.lastIndexOf("]")+1);
+        //debugOutput( "parseResult(): " + result );
         if(result == "") return new Array();
         var decodedJSON:Object = JSON.decode(result);
         return ArrayUtil.toArray(decodedJSON);

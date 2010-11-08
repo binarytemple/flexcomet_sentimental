@@ -6,10 +6,10 @@
 <mx:VBox x="10" y="64" height="100%" width="100%">
 <mx:HBox x="10" y="20" width="100%">
   <mx:Label text="Comet URL" fontSize="16"/>
-  <mx:TextInput id="CometURLInput"/>
+  <mx:TextInput id="CometURLInput" />
   <mx:Button id="InitButton" label="Initialize client" click="onInitClient()"/>
 </mx:HBox>
-<mx:VBox id="MainUI" enabled="false">
+<mx:VBox id="MainUI" enabled="false" width="100%" height="100%">
 <mx:HBox x="10" y="20" width="100%">
   <mx:Label text="Subscribe Channel" fontSize="16"/>
   <mx:TextInput id="ChannelInput" enter="onSubscribe()"/>
@@ -20,13 +20,15 @@
 <mx:TextArea id="ReceivedMessagesText" editable="false" width="100%" height="150" valueCommit="ReceivedMessagesText.verticalScrollPosition=ReceivedMessagesText.maxVerticalScrollPosition"/>
 <mx:HBox>
   <mx:Label text="Publish Channel" fontSize="16"/>
-  <mx:TextInput id="PublishChannelInput"/>
+  <mx:TextInput id="PublishChannelInput" text="/service/hello"/>
   <mx:Label text="Publish Message" fontSize="16"/>
-  <mx:TextInput id="PublishMessagesEntry" enter="onPublish()" editable="true" width="100%" height="30"/>
+  <mx:TextInput id="PublishMessagesEntry" enter="onPublish()" editable="true" width="100%" height="30" />
   <mx:Button id="PublishButton" label="Publish" click="onPublish()" enabled="true"/>
 </mx:HBox>
-<mx:Label text="Debug Messages" fontSize="16"/>
-<mx:TextArea id="DebugMessages" editable="false" width="100%" height="80" valueCommit="DebugMessages.verticalScrollPosition=DebugMessages.maxVerticalScrollPosition"/>	
+	<mx:Panel width="100%" height="100%" layout="absolute" title="Debug Messages">
+		<mx:Button label="Clear messages" click="doClearMessages()" />
+		<mx:TextArea id="DebugMessages" editable="false" width="100%" height="80" valueCommit="DebugMessages.verticalScrollPosition=DebugMessages.maxVerticalScrollPosition" x="0" y="30"/>
+	</mx:Panel>
 </mx:VBox>
 </mx:VBox>
 </mx:Panel>
@@ -57,12 +59,16 @@
 		
 		cometURL = "http://" + cometServer + cometPath;
 		CometURLInput.text = cometURL;
+		CometURLInput.text = "http://localhost:8080/comet/cometd";
+		ChannelInput.text = "/service/hello";
+		PublishMessagesEntry.text = '{"name": "world"}';
 	}
 	
 	private function onInitClient():void {
 		h = new CometClient();
 		h.cometURL = CometURLInput.text;
 		h.debugHandler = debugMessageHandler;
+		h.subscribe(
         h.init();
         MainUI.enabled = true;
 	}
@@ -74,13 +80,18 @@
     private function onSubscribe():void {
         h.subscribe( ChannelInput.text, onSubscribeResponse, null);
     }
+    
+    private function doClearMessages():void {
+    	DebugMessages.text = "";
+    	ReceivedMessagesText.text = "";
+    }
 
     private function onUnsubscribe():void {
         h.unsubscribe( ChannelInput.text );
     }
 
     private function onSubscribeResponse(obj:Object):void {
-        ReceivedMessagesText.text += JSON.encode(obj) + "\n";
+    	ReceivedMessagesText.text += JSON.encode(obj) + "\n";
     }
 
     private function onPublish():void {
